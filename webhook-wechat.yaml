@@ -1,0 +1,73 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: webhook-wechat
+  name: webhook-wechat
+spec:
+  selector:
+    matchLabels:
+      app: webhook-wechat
+  template:
+    metadata:
+      labels:
+        app: webhook-wechat
+    spec:
+      containers:
+      - env:
+        - name: RoomName
+          value: test
+        image: registry.cn-beijing.aliyuncs.com/glodon-common/webhook-wechat:v1
+        imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+          timeoutSeconds: 5
+        name: webhook-wechat
+        ports:
+        - containerPort: 80
+          name: webhook-wechat
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 8088
+          timeoutSeconds: 5
+        resources:
+          limits:
+            memory: 1000Mi
+          requests:
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: timezone
+      restartPolicy: Always
+      volumes:
+      - name: timezone
+        hostPath:
+          path: /etc/localtime
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: webhook-wechat
+  name: wechat-svc
+spec:
+  ports:
+  - nodePort: 30259
+    port: 8088
+    protocol: TCP
+    targetPort: webhook-wechat
+  selector:
+    app: webhook-wechat
+  type: NodePort
+
