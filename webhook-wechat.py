@@ -14,18 +14,18 @@ import os
 # 发送恢复信息  v7
 
 
-def SentChatRoomsMsg(msg, cluster):
-    iRoom = itchat.search_chatrooms(name=cluster)
+def SentChatRoomsMsg(msg, IRoomName):
+    iRoom = itchat.search_chatrooms(name=IRoomName)
     if not iRoom:
         memberList = itchat.search_friends(name="3999")
         memberList.extend(itchat.search_friends(name="Mr.Liu                      🙃"))
         memberList.extend(itchat.search_friends("萤火"))
         time.sleep(10)
-        new_iRoom_list = itchat.create_chatroom(memberList, cluster)
+        new_iRoom_list = itchat.create_chatroom(memberList, IRoomName)
         iRoom_id = new_iRoom_list["ChatRoomName"]
         print('iRoom_id: %s' % iRoom_id)
         itchat.update_chatroom(iRoom_id, detailedMember=True)
-        iRoom = itchat.search_chatrooms(name=cluster)
+        iRoom = itchat.search_chatrooms(name=IRoomName)
         print(iRoom)
     print('发送指定群组名字：%s'%iRoom[0]['UserName'])
     rest=itchat.send_msg(msg=msg, toUserName=iRoom[0]['UserName'])
@@ -85,18 +85,18 @@ def send():
         post_data = post_data.decode('utf-8')
         print("时间：%s 收到json数据： %s" % (time.strftime('%Y-%m-%d %X'), post_data))
         try:
-            send_data, cluster = transform(post_data)  # 数据格式化
+            send_data, IRoomName = transform(post_data)  # 数据格式化
         except Exception as err:
             print('数据格式化出现问题:%s，问题数据：%s'%(err,post_data))
 
         try:
-            SentChatRoomsMsg(send_data, cluster)
+            SentChatRoomsMsg(send_data, IRoomName)
         except Exception as e:
             print('发送微信指定群组出现问题:', e)
         time.sleep(5)
-        cluster = '运维服务部报警接收群'
+        IRoomName = '运维服务部报警接收群'
         print('发送微信群，运维服务部报警接收群')
-        SentChatRoomsMsg(send_data, cluster)
+        SentChatRoomsMsg(send_data, IRoomName)
     return "succeed"
 
 
