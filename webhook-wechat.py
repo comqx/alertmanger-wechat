@@ -110,6 +110,9 @@ if __name__ == '__main__':
 
     # P1=Process(target =app.run(host='0.0.0.0', port=8099)) #开启线程运行flask
     # P1.start()
-    ti=Thread(target=app.run(host='0.0.0.0', port=8088,Threaded=True)) #开启线程运行flask
+    ti=Thread(target=app.run(host='0.0.0.0', port=8088)) #开启线程运行flask
     ti.start()
     itchat.run()
+
+
+
