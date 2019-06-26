@@ -31,10 +31,10 @@ def SentChatRoomsMsg(msg, IRoomName):
 
 #找到集群名和微信群的对应关系 CustomIRoomNameJson
 def CustomIRoomName(ClusterName):
+    # CustomIRoomNameDict={'ptc-yw-pro-hbali': '运维服务部报警接收群', 'NullClusterName': '运维服务部报警接收群'}
     CustomIRoomNameDict=json.loads(os.getenv('CustomIRoomNameJson'))
-    # {"ptc-ywd-pro-hbali":"云文档","ptc-yw-pro-hbali":"云文档","NullClusterName":""}
     if ClusterName in CustomIRoomNameDict:
-        IRoomName = CustomIRoomNameDict['ClusterName']
+        IRoomName = CustomIRoomNameDict[ClusterName]
     else:
         IRoomName=ClusterName
     return IRoomName
@@ -56,6 +56,7 @@ def transform(post_data):
             status = "没有获取到状态"
         if not ClusterName:
             ClusterName = "NullClusterName"
+
         alertname = alert["labels"].get("alertname")
         namespace = alert["labels"].get("namespace")
         host_ip = alert["labels"].get("host_ip")
@@ -78,7 +79,7 @@ def transform(post_data):
                     "开始时间:  {} \n".format(time_start) + \
                     "当前时间:  {} \n".format(time_now)
         count += 1
-        IRoomName=CustomIRoomName(ClusterName)
+    IRoomName=CustomIRoomName(ClusterName)
     return fire_msg, IRoomName
 
 app = Flask(__name__)
@@ -91,19 +92,21 @@ def send():
         post_data = request.get_data()
         post_data = post_data.decode('utf-8')
         print("时间：%s 收到json数据： %s" % (time.strftime('%Y-%m-%d %X'), post_data))
-        try:
-            send_data, IRoomName = transform(post_data)  # 数据格式化
-        except Exception as err:
-            print('数据格式化出现问题:%s，问题数据：%s'%(err,post_data))
+        # try:
+        send_data, IRoomName = transform(post_data)  # 数据格式化
+        # except Exception as err:
+        #     print('数据格式化出现问题:%s，问题数据：%s'%(err,post_data))
 
         try:
             SentChatRoomsMsg(send_data, IRoomName)
         except Exception as e:
             print('发送微信指定群组出现问题:', e)
         time.sleep(5)
-        if IRoomName != '运维服务部报警接收群':
-            IRoomName = '运维服务部报警接收群'
-            SentChatRoomsMsg(send_data, IRoomName)
+        print(IRoomName)
+        if IRoomName == '运维服务部报警接收群':
+            return "succeed"
+        IRoomName = '运维服务部报警接收群'
+        SentChatRoomsMsg(send_data, IRoomName)
     return "succeed"
 
 
