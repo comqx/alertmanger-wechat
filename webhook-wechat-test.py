@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #-*- coding: utf-8 -*-
 # writer:lqx
+import os
+IRoomName='运维服务部报警接收群'
+if IRoomName != '运维服务部报警接收群':
+    IRoomName = '运维服务部报警接收群'
 
-dict={"yw":"运维","kaifa":"开发","yws":"运维"}
-
-if 'yw' in dict:
-    print('true')
+    print(111)

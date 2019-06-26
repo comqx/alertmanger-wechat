@@ -11,8 +11,6 @@ import time
 from multiprocessing import Process
 import os
 
-# 发送恢复信息  v7
-
 
 def SentChatRoomsMsg(msg, IRoomName):
     iRoom = itchat.search_chatrooms(name=IRoomName)
@@ -27,10 +25,19 @@ def SentChatRoomsMsg(msg, IRoomName):
         itchat.update_chatroom(iRoom_id, detailedMember=True)
         iRoom = itchat.search_chatrooms(name=IRoomName)
         print(iRoom)
-    print('发送指定群组名字：%s'%iRoom[0]['UserName'])
+    print('发送指定群组名字:%s,%s'%(IRoomName,iRoom[0]['UserName']))
     rest=itchat.send_msg(msg=msg, toUserName=iRoom[0]['UserName'])
     print('发送指定群组后返回值：%s'%rest)
 
+#找到集群名和微信群的对应关系
+def CustomIRoomName(ClusterName):
+    CustomIRoomNameDict=json.loads(os.getenv('CustomIRoomNameJson'))
+    # {"ptc-ywd-pro-hbali":"云文档","ptc-yw-pro-hbali":"云文档","NullClusterName":""}
+    if ClusterName in CustomIRoomNameDict:
+        IRoomName = CustomIRoomNameDict['ClusterName']
+    else:
+        IRoomName=ClusterName
+    return IRoomName
 
 # 数据格式化
 def transform(post_data):
@@ -40,15 +47,15 @@ def transform(post_data):
     time_now = time.strftime('%Y-%m-%d %X')
     for alert in data_dict['alerts']:
         level = alert["labels"].get("severity")
-        cluster = alert["labels"].get("cluster")
+        ClusterName = alert["labels"].get("cluster")
         if alert.get("status") == "firing":
             status = "触发报警"
         elif alert.get("status") == "resolved":
             status = "已经恢复"
         else:
             status = "没有获取到状态"
-        if not cluster:
-            cluster = "运维服务部报警接收群"
+        if not ClusterName:
+            ClusterName = "NullClusterName"
         alertname = alert["labels"].get("alertname")
         namespace = alert["labels"].get("namespace")
         host_ip = alert["labels"].get("host_ip")
@@ -61,7 +68,7 @@ def transform(post_data):
         time_start = alert["startsAt"].split(".")[0]
         # time_start=datetime.datetime.strptime(time_start,'%Y-%m-%dT%H:%M:%S')+ datetime.timedelta(hours=8)
         fire_msg += "---------第 {} 条---------\n".format(count) + \
-                    "环境： {0}\n".format(cluster) + \
+                    "环境： {0}\n".format(ClusterName) + \
                     "问题状态： {0}\n".format(status) + \
                     "告警级别： {0}\n".format(level) + \
                     "报警名称:  {} \n".format(alertname) + \
@@ -71,8 +78,8 @@ def transform(post_data):
                     "开始时间:  {} \n".format(time_start) + \
                     "当前时间:  {} \n".format(time_now)
         count += 1
-    return fire_msg, cluster
-
+        IRoomName=CustomIRoomName(ClusterName)
+    return fire_msg, IRoomName
 
 app = Flask(__name__)
 # 接收alertmanager的报警数据
@@ -94,9 +101,9 @@ def send():
         except Exception as e:
             print('发送微信指定群组出现问题:', e)
         time.sleep(5)
-        IRoomName = '运维服务部报警接收群'
-        print('发送微信群，运维服务部报警接收群')
-        SentChatRoomsMsg(send_data, IRoomName)
+        if IRoomName != '运维服务部报警接收群':
+            IRoomName = '运维服务部报警接收群'
+            SentChatRoomsMsg(send_data, IRoomName)
     return "succeed"
 
 
@@ -105,9 +112,10 @@ if __name__ == '__main__':
     import platform
     if platform.system() == "Windows":
         itchat.auto_login(enableCmdQR=False, hotReload=True, statusStorageDir='itchat.pkl')
+        print('获取变量成功',json.loads(os.getenv('CustomIRoomNameJson')))
     else:
         itchat.auto_login(enableCmdQR=True, hotReload=True, statusStorageDir='itchat.pkl')
-
+        print('获取变量成功', json.loads(os.getenv('CustomIRoomNameJson')))
     # P1=Process(target =app.run(host='0.0.0.0', port=8099)) #开启线程运行flask
     # P1.start()
     ti=Thread(target=app.run(host='0.0.0.0', port=8088)) #开启线程运行flask

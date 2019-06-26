@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - env:
-        - name: RoomName
-          value: test
+        - name: CustomIRoomNameJson
+          value: '{"ptc-ywd-pro-hbali":"云文档","ptc-yw-pro-hbali":"运维服务部报警接收群","NullClusterName":"运维服务部报警接收群"}'
         image: registry.cn-beijing.aliyuncs.com/glodon-common/webhook-wechat:v1
         imagePullPolicy: Always
         livenessProbe:
