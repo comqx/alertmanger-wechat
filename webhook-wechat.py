@@ -29,7 +29,7 @@ def SentChatRoomsMsg(msg, IRoomName):
     rest=itchat.send_msg(msg=msg, toUserName=iRoom[0]['UserName'])
     print('发送指定群组后返回值：%s'%rest)
 
-#找到集群名和微信群的对应关系
+#找到集群名和微信群的对应关系 CustomIRoomNameJson
 def CustomIRoomName(ClusterName):
     CustomIRoomNameDict=json.loads(os.getenv('CustomIRoomNameJson'))
     # {"ptc-ywd-pro-hbali":"云文档","ptc-yw-pro-hbali":"云文档","NullClusterName":""}
