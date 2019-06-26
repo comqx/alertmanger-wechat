@@ -1,6 +1,15 @@
 
-# alert发送告警到微信群
+# 通过alert发送数据到webhook
+
 
 # 功能简要
-- 自动创建群组
-- 自动根据指定消息发送指定群组
+- 微信接收告警
+- 邮件接收告警
+- 短信接收告警
+
+# 测试地址
+```angular2
+http://webhook.xxx.com/v2/alertmanager/post
+```
+# 测试数据文件
+test.txt
