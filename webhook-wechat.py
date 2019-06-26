@@ -102,9 +102,12 @@ def send():
 
 if __name__ == '__main__':
     #    itchat.auto_login(enableCmdQR=False,hotReload=False)
+    import platform
+    if platform.system() == "Windows":
+        itchat.auto_login(enableCmdQR=False, hotReload=True, statusStorageDir='itchat.pkl')
+    else:
+        itchat.auto_login(enableCmdQR=True, hotReload=True, statusStorageDir='itchat.pkl')
 
-    os.path
-    itchat.auto_login(enableCmdQR=False, hotReload=True, statusStorageDir='itchat.pkl')
     # P1=Process(target =app.run(host='0.0.0.0', port=8099)) #开启线程运行flask
     # P1.start()
     ti=Thread(target=app.run(host='0.0.0.0', port=8088,Threaded=True)) #开启线程运行flask
