@@ -66,8 +66,9 @@ def transform(post_data):
             host_ip = alert["labels"].get("node")
         if alert.get("annotations"):
             annotations_msg = alert["annotations"].get("message")
+            if  not annotations_msg:
+                annotations_msg = alert["annotations"].get("description")
         time_start = alert["startsAt"].split(".")[0]
-        # time_start=datetime.datetime.strptime(time_start,'%Y-%m-%dT%H:%M:%S')+ datetime.timedelta(hours=8)
         fire_msg += "---------第 {} 条---------\n".format(count) + \
                     "环境： {0}\n".format(ClusterName) + \
                     "问题状态： {0}\n".format(status) + \
