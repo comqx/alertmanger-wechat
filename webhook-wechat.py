@@ -47,13 +47,15 @@ def transform(post_data):
     time_now = time.strftime('%Y-%m-%d %X')
     for alert in data_dict['alerts']:
         level = alert["labels"].get("severity")
+        if level == 'critical':
+            level+=' [发怒][发怒][发怒]'
         ClusterName = alert["labels"].get("cluster")
         if alert.get("status") == "firing":
-            status = "触发报警"
+            status = "触发报警 [惊恐][惊恐][惊恐]"
         elif alert.get("status") == "resolved":
-            status = "已经恢复"
+            status = "已经恢复 [愉快][愉快][愉快]"
         else:
-            status = "没有获取到状态"
+            status = "没有获取到状态[疑问][疑问][疑问]"
         if not ClusterName:
             ClusterName = "NullClusterName"
 
