@@ -48,7 +48,7 @@ def transform(post_data):
     for alert in data_dict['alerts']:
         level = alert["labels"].get("severity")
         if level == 'critical':
-            level+=' [发怒][发怒][发怒]'
+            level+=' [发怒]'
         ClusterName = alert["labels"].get("cluster")
         if alert.get("status") == "firing":
             status = "触发报警 [惊恐][惊恐][惊恐]"
