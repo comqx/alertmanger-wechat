@@ -1,5 +1,5 @@
 #!/bin/sh
 
 
-python3 webhook-wechat.py
+python3 -u  webhook-wechat.py
 

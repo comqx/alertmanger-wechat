@@ -17,7 +17,7 @@ spec:
       - env:
         - name: CustomIRoomNameJson
           value: '{"ptc-ywd-pro-hbali":"云文档","ptc-yw-pro-hbali":"运维服务部报警接收群","NullClusterName":"运维服务部报警接收群"}'
-        image: registry.cn-beijing.aliyuncs.com/glodon-common/webhook-wechat:v1
+        image: registry.cn-beijing.aliyuncs.com/glodon-common/webhook-wechat:v8.1
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 3
@@ -48,12 +48,23 @@ spec:
         volumeMounts:
         - mountPath: /etc/localtime
           name: timezone
+        - mountPath: /webhook-wechat/store
+          name: webchatstore
       restartPolicy: Always
       volumes:
       - name: timezone
         hostPath:
           path: /etc/localtime
-
+  volumeClaimTemplates:
+  - metadata:
+      name: webchatstore
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 20Gi
+      storageClassName: alicloud-disk-ssd-bj
 ---
 apiVersion: v1
 kind: Service
